@@ -6,17 +6,17 @@ const expenseTracker = {
 
     addExpense(title, amount, category) {
         if (!title || typeof title !== 'string' || title.trim() === '') {
-            console.log('Ошибка: Название напиши аааааааааааааааааааааааааааааа нету ничоооо');
+            console.log('Ошибка: Название не может быть пустым');
             return null;
         }
         
         if (!amount || isNaN(amount) || amount <= 0) {
-            console.log('Ошибка: как у тебя сумма в минус ушла ? в долги вошли((((');
+            console.log('Ошибка: Сумма должна быть положительным числом');
             return null;
         }
         
         if (!category || typeof category !== 'string' || category.trim() === '') {
-            console.log('Ошибка: категории нельзя быть пустой вапсета');
+            console.log('Ошибка: Категория не может быть пустой');
             return null;
         }
 
@@ -28,35 +28,35 @@ const expenseTracker = {
         };
         
         this.expenses.push(expense);
-        console.log(`Расход "${title}" на сумму ${amount} руб. добавлен в этуу категорию "${category}"`);
+        console.log(`Расход "${title}" на сумму ${amount} руб. добавлен в категорию "${category}"`);
         return expense;
     },
 
     printAllExpenses() {
         if (this.expenses.length === 0) {
-            console.log('Список расходов пуст(((((((((((');
+            console.log('Список расходов пуст');
             return;
         }
 
-        console.log('все расходыыыыыыыыыыыыыыыыыыыыыыы:');
+        console.log('Все расходы:');
         this.expenses.forEach(expense => {
-            console.log(`idишник: ${expense.id}`);
-            console.log(`tiтлник: ${expense.title}`);
-            console.log(`sumма: ${expense.amount}`);
-            console.log(`cateгория: ${expense.category}`);
+            console.log(`ID: ${expense.id}`);
+            console.log(`Название: ${expense.title}`);
+            console.log(`Сумма: ${expense.amount}`);
+            console.log(`Категория: ${expense.category}`);
             console.log('---');
         });
     },
 
     getTotalAmount() {
         const total = this.expenses.reduce((sum, expense) => sum + expense.amount, 0);
-        console.log(`\nВот стока у тебя денег щас: ${total} руб.`);
+        console.log(`\nОбщая сумма расходов: ${total} руб.`);
         return total;
     },
 
     getExpensesByCategory(category) {
         if (!category || typeof category !== 'string') {
-            console.log('Ошибка: категорию напиши а то я не понимаю ничо тупой я');
+            console.log('Ошибка: Укажите категорию');
             return [];
         }
 
@@ -65,24 +65,24 @@ const expenseTracker = {
         );
         
         if (filtered.length === 0) {
-            console.log(`В категории "${category}" расходов нема`);
+            console.log(`В категории "${category}" расходов нет`);
             return [];
         }
 
         const totalByCategory = filtered.reduce((sum, expense) => sum + expense.amount, 0);
         
-        console.log(`\nСколько денег ты тратил в этой категории "${category}":`);
+        console.log(`\nРасходы в категории "${category}":`);
         filtered.forEach(expense => {
             console.log(`  ${expense.title}: ${expense.amount} руб.`);
         });
-        console.log(`Итого ::: ${totalByCategory} руб.`);
+        console.log(`Итого: ${totalByCategory} руб.`);
         
         return filtered;
     },
 
     findExpenseByTitle(searchString) {
         if (!searchString || typeof searchString !== 'string') {
-            console.log('Ошибка: строку для поиска напиши');
+            console.log('Ошибка: Введите строку для поиска');
             return null;
         }
 
@@ -91,13 +91,13 @@ const expenseTracker = {
         );
 
         if (found) {
-            console.log(`\nНашлись расходы:`);
-            console.log(`IDиишник: ${found.id}`);
-            console.log(`Nazvание: ${found.title}`);
-            console.log(`сумma: ${found.amount} руб.`);
-            console.log(`Cateгория: ${found.category}`);
+            console.log(`\nНайден расход:`);
+            console.log(`ID: ${found.id}`);
+            console.log(`Название: ${found.title}`);
+            console.log(`Сумма: ${found.amount} руб.`);
+            console.log(`Категория: ${found.category}`);
         } else {
-            console.log(`Расход с названием "${searchString}", не найден`);
+            console.log(`Расход с названием "${searchString}" не найден`);
         }
 
         return found;
@@ -105,7 +105,7 @@ const expenseTracker = {
 
     deleteExpenseById(id) {
         if (!id || isNaN(id)) {
-            console.log('Ошибка: напиши номарльный IDишник');
+            console.log('Ошибка: Введите корректный ID');
             return false;
         }
 
@@ -123,40 +123,58 @@ const expenseTracker = {
     },
 
     getCategoryStatistics() {
-        if (this.expenses.length === 0) {
-            console.log('Нет расходов для статистики');
-            return {};
-        }
+    if (this.expenses.length === 0) {
+        console.log('Нет расходов для статистики');
+        return;
+    }
 
-        const statistics = {};
-        const totalAmount = this.getTotalAmount();
-
-        this.expenses.forEach(expense => {
-            if (!statistics[expense.category]) {
-                statistics[expense.category] = {
-                    total: 0,
-                    count: 0,
-                    items: []
-                };
+    let categories = [];
+    for (let i = 0; i < this.expenses.length; i++) {
+        let categoryExists = false;
+        for (let j = 0; j < categories.length; j++) {
+            if (categories[j] === this.expenses[i].category) {
+                categoryExists = true;
+                break;
             }
-            statistics[expense.category].total += expense.amount;
-            statistics[expense.category].count++;
-            statistics[expense.category].items.push(expense.title);
-        });
+        }
+        if (!categoryExists) {
+            categories[categories.length] = this.expenses[i].category;
+        }
+    }
 
-        console.log('\nСтатистика по категориям:');
+    const totalAmount = this.getTotalAmount();
+    
+    console.log('\nСТАТИСТИКА ПО КАТЕГОРИЯМ:');
+
+    for (let i = 0; i < categories.length; i++) {
+        let categoryTotal = 0;
+        let categoryCount = 0;
+        let categoryItems = '';
         
-        Object.keys(statistics).forEach(category => {
-            const catStats = statistics[category];
-            const percentage = ((catStats.total / totalAmount) * 100).toFixed(1);
-            
-            console.log(`\nКатеgoria: ${category}`);
-            console.log(`Суммаsum: ${catStats.total} руб. (${percentage}%)`);
-            console.log(`кол-vo расходов: ${catStats.count}`);
-            console.log(`Расhodi: ${catStats.items.join(', ')}`);
-        });
-  
-        return statistics;
+        for (let j = 0; j < this.expenses.length; j++) {
+            if (this.expenses[j].category === categories[i]) {
+                categoryTotal += this.expenses[j].amount;
+                categoryCount++;
+                
+                if (categoryItems === '') {
+                    categoryItems = this.expenses[j].title;
+                } else {
+                    categoryItems = categoryItems + ', ' + this.expenses[j].title;
+                }
+            }
+        }
+        
+        let percentage = (categoryTotal / totalAmount * 100).toFixed(1);
+        
+      
+        console.log(`\nКАТЕГОРИЯ: ${categories[i]}`);
+        console.log(` Процент: ${percentage}%`);
+        console.log(` Сумма: ${categoryTotal} руб.`);
+        console.log(` Количество расходов: ${categoryCount}`);
+        console.log(` Что покупал: ${categoryItems}`);
+    }
+    
+        console.log(`ВСЕГО ПОТРАЧЕНО: ${totalAmount} руб.`);
     },
 
     switchView(viewType) {
@@ -177,36 +195,43 @@ const expenseTracker = {
 };
 
 function showMenu() {
-    let menu = '\n' + '='.repeat(50) + '\n';
-    menu += 'ПЕРСОНАЛЬНЫЙ ТРЕКЕР РАСХОДОВ\n';
-    menu += '='.repeat(50) + '\n';
-    menu += '1. Добавить расход\n';
-    menu += '2. Показать все расходы\n';
-    menu += '3. Показать общий баланс\n';
-    menu += '4. Поиск по категории\n';
-    menu += '5. Поиск по названию\n';
-    menu += '6. Удалить расход по ID\n';
-    menu += '7. Показать статистику по категориям\n';
-    menu += '8. Переключить представление (all/total/statistics)\n';
-    menu += '9. Добавить тестовые данные\n';
-    menu += '0. Выход\n';
-    menu += '='.repeat(50);
-    
-    console.log(menu);
+    console.log('ПЕРСОНАЛЬНЫЙ ТРЕКЕР РАСХОДОВ');
+    console.log('1. Добавить расход');
+    console.log('2. Показать все расходы');
+    console.log('3. Показать общий баланс');
+    console.log('4. Поиск по категории');
+    console.log('5. Поиск по названию');
+    console.log('6. Удалить расход по ID');
+    console.log('7. Показать статистику по категориям');
+    console.log('8. Добавить тестовые данные');
+    console.log('0. Выход');
 }
 
-function startBrowserApp() {
-    console.log('Добро пожаловать в трекер расходов! (работает в консоли браузера)');
-    console.log('Вводи цифры от 0 до 9 и следуй инструкциям');
+function startApp() {
+    console.log('Добро пожаловать в трекер расходов!');
     
-    showMenu();
+    expenseTracker.addExpense('подкуп преподавателя', 5000, 'учеба');
+    expenseTracker.addExpense('чикенбургер', 60, 'Еда');
+    expenseTracker.addExpense('Такси', 300, 'Транспорт');
+    expenseTracker.addExpense('компьютер', 800, 'Развлечения');
+    expenseTracker.addExpense('Кофе', 200, 'Еда');
+    expenseTracker.addExpense('Пицца', 500, 'Еда');
+    expenseTracker.addExpense('Метро', 70, 'Транспорт');
+    expenseTracker.addExpense('Кино', 400, 'Развлечения');
+    expenseTracker.addExpense('Книга', 350, 'учеба');
     
-    window.menuHandler = function(choice) {
+    let running = true;
+    
+    while (running) {
+        showMenu();
+        
+        const choice = prompt('Выберите пункт меню (1-8 , 0 - выход):');
+        
         switch(choice) {
             case '1':
-                const title = prompt('Введи название расхода:');
-                const amount = prompt('Введи сумму:');
-                const category = prompt('Введи категорию:');
+                const title = prompt('Введите название расхода:');
+                const amount = prompt('Введите сумму:');
+                const category = prompt('Введите категорию:');
                 expenseTracker.addExpense(title, amount, category);
                 break;
 
@@ -219,17 +244,17 @@ function startBrowserApp() {
                 break;
 
             case '4':
-                const cat = prompt('Введи категорию для поиска:');
+                const cat = prompt('Введите категорию для поиска:');
                 expenseTracker.getExpensesByCategory(cat);
                 break;
 
             case '5':
-                const search = prompt('Введи название для поиска:');
+                const search = prompt('Введите название для поиска:');
                 expenseTracker.findExpenseByTitle(search);
                 break;
 
             case '6':
-                const id = prompt('Введи ID расхода для удаления:');
+                const id = prompt('Введите ID расхода для удаления:');
                 expenseTracker.deleteExpenseById(Number(id));
                 break;
 
@@ -238,35 +263,25 @@ function startBrowserApp() {
                 break;
 
             case '8':
-                const view = prompt('Введи тип (all/total/statistics):');
-                expenseTracker.switchView(view);
-                break;
-
-            case '9':
-                expenseTracker.addExpense('подкуп преподователя(шутка)', 5000, 'учеба');
-                expenseTracker.addExpense('чикенбургер', 60, 'Еда');
-                expenseTracker.addExpense('Такси', 300, 'Транспорт');
-                expenseTracker.addExpense('коmpek', 800, 'Развлечения');
-                expenseTracker.addExpense('Кофе', 200, 'Еда');
+                expenseTracker.addExpense('Мороженое', 100, 'Еда');
+                expenseTracker.addExpense('Автобус', 50, 'Транспорт');
+                expenseTracker.addExpense('Игры', 1000, 'Развлечения');
                 console.log('Тестовые данные добавлены!');
                 break;
 
             case '0':
-                console.log('Пока пока! Обнови страницу чтобы начать заново');
-                return;
+                console.log('Программа завершена. До свидания!');
+                running = false;
+                break;
 
             default:
-                console.log('Неверный выбор. Попробуй от 0 до 9');
+                console.log('Неверный выбор. Используйте цифры от 0 до 9');
         }
+        
+        if (running && choice !== '0') {
+            prompt('\nНажмите Enter чтобы ');
+        }
+    }
 }
 
-
-expenseTracker.addExpense('подкуп преподователя(шутка)', 5000, 'учеба');
-expenseTracker.addExpense('чикенбургер', 60, 'Еда');
-expenseTracker.addExpense('Такси', 300, 'Транспорт');
-expenseTracker.addExpense('коmpek', 800, 'Развлечения');
-expenseTracker.addExpense('Кофе', 200, 'Еда');
-
-
-startBrowserApp();
-window.tracker = expenseTracker;
+startApp();
